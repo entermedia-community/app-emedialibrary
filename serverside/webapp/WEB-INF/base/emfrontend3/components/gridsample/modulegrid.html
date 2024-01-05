@@ -1,0 +1,139 @@
+#set($moduleid = $module.getId())
+$context.putPageValue("moduleid", $moduleid)
+
+#set($filter = $modulehits.findFilterValue("entitysourcetype") )
+$context.putPageValue("filter", $filter)
+
+	<div class="emgrid-module emgrid-box emgrid-column emgrid-module-$!rendertype">
+   		<div class="emgrid-subtitle">
+	   		<h3>
+		     	#set($moduleicon = "entity")
+		     	#if ($module.moduleicon)
+		     		#set($moduleicon = $module.moduleicon)
+		     	#end
+		     	
+		     	#set($rendertype = $module.modulerendertype)
+				
+				#if (!$rendertype)
+				   	#set($rendertype = "entity")
+				#end
+				$context.putPageValue("entityrendertype", $rendertype)
+		     	
+	     		#set($entityurl = "$!siteroot$apphome/views/modules/$!{module.id}/index.html?$!{module.id}page=1&hitssessionid=$!hits.getSessionId()")
+	
+				<a href="$entityurl" 
+					class="ajax minimizeexpandedmoduleX" 
+					data-targetdiv="applicationcontent" 
+					data-oemaxlevel="4" 
+					data-updateurl="true" 
+					data-profilepreference="defaultmodule"
+					data-profilepreference.value="$!module.getId()"
+					title="#text($module)" >
+				
+					<img src="$siteroot$apphome/theme/images/entity/${moduleicon}.svg" style="height: 25px; max-width:20px;"> 
+				
+					#if( $module.id == "asset") ##this is safe
+						#set( $count = $hits.size()) 
+					#else
+						#set( $count = $filter.getCount($module.id) ) 
+					#end
+					#ifnull($count)
+						#set( $count = $hits.size()) 
+					#end
+					#text($module)
+					 <span class="count">($count)</span>
+					</a>
+					
+					#if($topmoduleid != "favorites")
+						$pages.include("$apphome/views/modules/${moduleid}/contextmenu.html", $context)
+					#end
+			</h3>
+			
+			#if($topmoduleid != "favorites")
+			<div style="float:right" >
+				#if($moduleid=="asset")
+					
+					<a href="$entityurl" 
+					class="btn-sm btn-blue btn-view-media entity-add-media ajax"
+					data-targetdiv="applicationcontent"
+					data-sidebarcomponent="categories"
+					data-oemaxlevel="4"
+					title="[[View Media]]" 
+					data-profilepreference="defaultmodule"
+					data-profilepreference.value="$!module.getId()">
+					<i class="fas fa-images"></i> [[View Media]]</a>
+				#else
+					<a href="$entityurl" 
+					class="ajax minimizeexpandedmodule" 
+					data-targetdiv="applicationcontent" 
+					data-oemaxlevel="4" 
+					data-updateurl="true" 
+					data-profilepreference="defaultmodule"
+					data-profilepreference.value="$!module.getId()"
+					title="[[Expand]] #text($module)">
+					<i class="fas fa-window-maximize"></i></a>
+				
+				#end
+			</div>
+			#end
+		<div class="clearfix"></div>
+   		</div>
+
+		#set($rendertype = "entity")
+	   	#if ($module.modulerendertype)
+	   		#set($rendertype = $module.modulerendertype)
+	   	#end
+	   	$context.putPageValue("rendertype", $rendertype)
+	   	$context.putPageValue("rendermoduleid", $module.id)
+	   	
+	   	##check for view
+		#set($viewid = "${moduleid}gridfields")
+		#set($view = "$moduleid/$viewid")
+
+		#if( $context.getUserProfile() )
+			#set($searcher = $searcherManager.getSearcher($catalogid,$moduleid))
+			#set ($details = $searcher.getDetailsForView($view, $context.getUserProfile()))
+			
+		#else
+			#set ($details = $searcher.getDetailsForView($view))
+			
+		#end
+	   	$context.putPageValue("details", $details)
+	   
+	   $hits.setHitsPerPage(6)
+	 <div class="emgridflex">  	
+		<div id="galleryimg-${rendertype}" 
+				class='emgrid #if($section != "favorites")emgridlimited#end entitiescontainer' 
+				style="width:1125px"
+				data-fixedwidth="175" 
+				data-cellpadding="10"
+				data-entityrenderurl="$!{siteroot}$apphome/views/modules/${module.id}/components/gridsample/gridcell.html"
+				data-rendertype="$rendertype">
+				#foreach( $hit in $hits.getPageOfHits() )
+					$context.putPageValue("hit", $hit)
+				    $pages.include("$apphome/components/gridsample/gridcell.html", $context)
+				#end
+		</div>
+		
+		#if($permissions.can($moduleid, "create") && $moduleid!="faceprofilegroup" && $topmoduleid != "favorites")
+	 		#set($addurl = "$siteroot$applink/views/modules/${moduleid}/components/gridsample/preview/$!{rendertype}.html?edit=true&addnew=true&viewid=$!{moduleid}addnew")
+	 		#ifnotnull($topentityid)
+	 			#set($addurl = "$addurl&fieldexternalid=${topmodule.getId()}&fieldexternalvalue=${topentityid}&reloadtargets=topmodulecontainer")
+	 		#end
+			<div class=" emgrid-addmore " style="">
+				<a href="$addurl"
+				class="emdialog"
+				title="[[Add Record]]"
+				>[[Add New]]</a>
+			</div>
+		#end
+		
+		</div>
+		
+		
+		
+	</div>
+		
+		
+		
+			

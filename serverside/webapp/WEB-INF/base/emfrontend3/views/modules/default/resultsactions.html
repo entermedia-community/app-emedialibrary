@@ -1,0 +1,178 @@
+##Header for Modules (not asset)
+
+#set($moduleid = $module.id)
+$context.putPageValue("moduleid", $moduleid)
+
+#set($defaultview = $userprofile.getDefaultViewForModule($module.id) )
+
+##if($hits)
+	
+	#set($resulttype = $userprofile.get("${module.id}-display"))
+	#if(!$resulttype)
+		#set($resulttype = "table")
+	#end
+	$context.putPageValue("resulttype", $resulttype)
+	
+	#set($searchhome = $page.get("searchhome") )
+	
+	#set( $edit = $context.getRequestParameter("editheader"))
+	#if( !$edit || $edit == "false")
+		#set( $edit = false)
+	#end
+	
+	#set($entityrendertype = "entity")
+	#if ($module.modulerendertype)
+		#set($entityrendertype = $module.modulerendertype)
+	#end
+	$context.putPageValue("entityrendertype", $entityrendertype)
+	
+	#if(!$resultview)
+		#set($resultview = $userprofile.get("$!{module.getId()}resultview"))
+		
+		#if (!$resultview)
+			#set($resultview = $content.get("resultview"))
+		#end
+		#if (!$resultview)
+			#set($resultview = "table")
+		#end
+	#end
+	
+		<div id="resultsheader" class="resultsheader">
+		
+		
+		<div id="sub-nav" class="search-views emsubnav sub-nav-$!moduleid">
+			
+					<ul class="resultsnav">
+					
+					#if($permissions.can($moduleid, "create") && $moduleid!="faceprofilegroup")
+				 		#set($addurl = "$siteroot$applink/views/modules/${moduleid}/components/gridsample/preview/$!{entityrendertype}.html?edit=true&addnew=true&viewid=$!{moduleid}addnew")
+				 		#ifnotnull($topentityid)
+				 			#set($addurl = "$addurl&fieldexternalid=${topmodule.getId()}&fieldexternalvalue=${topentityid}&reloadtargets=topmodulecontainer")
+				 		#end
+				 		<li>
+				 		<a class=" emdialog" 
+				 			href="$addurl" 
+				 			title="[[Add New]]"><i class="fas fa-plus"></i> [[New]]</a>
+				 		</li>
+				 	#end
+					
+					#if($resultview == "grid")
+						#if($hits.getTotalPages() >  1  )
+							$pages.include("$apphome/views/modules/$module.id/navigate.html", $context)
+						
+						#end
+					#end
+					
+					#if($moduleid != "faceprofilegroup")
+						#if(!$edit)
+						
+							#if($hits && $resultview == "table" && $hits.hasSelections())
+								$pages.include("$searchhome/selectionactions.html", $context)
+							#end
+						#end
+					#end
+				
+			<li id="filtersselected" class="filtersselected">
+				$pages.include("$componenthome/filters/filters-inline.html", $context)
+			</li>	
+			<li> 
+			<div id="resultsmessages"></div>
+			</li>
+					
+					</ul>
+			
+	
+		#if($hits)
+		<ul class="resultsnavright">
+			#if($edit != "true")
+			
+				<li>
+					
+					<a href="$applink/views/modules/${moduleid}/components/filters/dialogsort.html" 
+					class="emdialog"
+					data-dialogid="sortdialog"
+					data-hidebackdrop="true"
+					data-hidefooter="true"
+					data-modalsize="sm"
+					data-moduleid="$!{moduleid}"
+					data-hitssessionid="$hits.getSessionId()"
+					data-categoryid="$!categoryid"
+					data-rootcategory="$!rootcategory"
+					data-targetdivsearch="$!{moduleid}resultscontainer"
+					 style="margin-right:10px;" title="[[Sort Results]]"><i class="fas fa-sort-amount-down"></i></a>
+				</li>
+			
+			
+				#set($total = $hits.getTotalPages() )
+				#if( $total > 1)
+				<li class="resultpages">	 
+					$pages.include("/${searchhome}/components/results/positions.html", $context)
+				</li>
+				#end
+				
+				#if($resultview != "stackedgallery" && $resultview != "grid")
+					<li class="resultsnavtitem" style="width:61px;">
+							#set( $currenthitsperpage = $hits.getHitsPerPage())
+							#set($hitcountoptions = $mediaarchive.getList("hitcount"))
+							<select class="form-control hitsperpagechange resultsnavselect" 
+								id="hitsperpagechange$!{moduleid}">
+							#foreach($ho in $hitcountoptions)
+							<option value="$ho.id" #if($currenthitsperpage==$ho.id) selected="selected"#end>#text($ho)</option>
+							#end	
+							</select>
+					</li>		
+				#end
+				
+
+			#end
+			#if (!$resultview || $resultview == 'table')
+				#if( $canedittablecolumns )
+					#if( $edit )
+						
+						<li class="resultsnavtitem" style="min-width:180px">
+						
+							#set ($alldetails = $searcher.getUserPropertyDetails() )
+							
+							<span class="hint">*[[Drag columns to move them]]</span>
+							<select class="form-control form-control-sm select2 tableresultsaddcolumn" 
+									name="addcolumn"
+									data-componenthome="$siteroot$componenthome/results/addremovecolumns.html?searchtype=$!moduleid&hitssessionid=$hits.getSessionId()&editheader=true&moduleid=$!moduleid&viewid=$!{moduleid}resultstable"
+									data-targetdiv="$!{moduleid}resultsarea"
+									data-oemaxlevel="1" 
+									data-allowclear="false" >
+								<option>[[Add Column]]</option>
+								#foreach( $detail in $alldetails) <option value="$detail.id">$detail.getText($context)</option>
+								#end
+							</select>
+							
+						</li>
+						##Close Icon
+						<li>
+							<a class="ajax table-edit-close" 
+								data-targetdiv="$!{moduleid}topcontainer"
+								data-oemaxlevel="2" 
+								href="${searchhome}/index.html?searchtype=$!moduleid&hitssessionid=$!hits.getSessionId()&editheader=false&moduleid=$!moduleid"><i class="fas fa-times"></i></a>
+						</li>
+					#else 
+						##Edit
+						<li >
+							<a class="ajax nav-hover" 
+								id="table-editor-close" 
+								data-targetdiv="$!{moduleid}topcontainer"
+								data-oemaxlevel="2" 
+								href="${searchhome}/index.html?hitssessionid=$hits.getSessionId()&editheader=true&moduleid=$!moduleid"> <i class="fas fa-edit"></i></a>
+						</li>
+					#end	
+				#end								
+			#end
+				<li class="resultsnavtitem">
+					<button class="btn summary-toggler summary-opener">
+						<i class="fas fa-angle-double-left"></i> [[Summary]]
+					</button>
+				</li>
+		</ul>
+		#end
+	</div>
+	</div>
+##end
+

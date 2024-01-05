@@ -1,0 +1,124 @@
+#ifnull($hits)
+	#set($hits = $modulehits)
+#end
+
+#set($hitssessionid = $hits.getSessionId())
+#set($moduleid = $module.id)
+#if (!$nodeID)
+	#set($nodeID = $context.getRequestParameter("nodeID"))
+	$context.putPageValue("nodeID",$nodeID)
+#end
+
+#if( !$librarycol && $category ) 
+	#set( $librarycol = $mediaarchive.query("librarycollection").orgroup("rootcategory",$category.getParentCategories()).searchOne() )
+#end
+
+#if( $librarycol )	
+	$context.putPageValue("librarycol",$librarycol)
+#end
+
+
+#if( $moduleid == "asset" && $content.section != "uploadmedia" )
+<div class="filtered filteredmain autostickywidth">
+
+	## BREADCRUMB
+	#if($canviewbreadcrumb)
+		<div class="filtered-breadcrumb">
+			#set($topentityid = $context.getRequestParameter("topentityid"))
+			#set($entityid = $context.getRequestParameter("entityid"))
+			
+			#set($currentSort = $hits.getSearchQuery().getSortBy())
+			
+			##TODO Loop over the view and show them here if they match
+			
+			#if( $category )
+					#set( $count = $hits.size())
+					#set($parentcategories = $category.getParentCategories())
+					
+					#if(!$parentcategories.isEmpty())
+						#foreach( $parent in $parentcategories)
+							#if( ${foreach.count} > 1) / #end
+							#if($category.getId() != $parent.getId())
+							<a style="padding:0px 4px 0;" 
+								href="$siteroot$apphome/views/modules/asset/viewfiles/$!{parent.id}/#dash($parent).html?hitssessionid=$!hits.getSessionId()"
+								title="[[View Files]]: $parent"
+								class="ajax"
+								data-targetdiv="applicationcontent"
+								data-oemaxlevel="5"
+								data-scrolltocat="true"
+								data-updateurl="true"
+								data-sidebarcomponent="categories">$parent</a>
+							#else
+							<span class="currentcategory">$parent</span>
+							#end		
+						#end
+						&nbsp;<span>($count)</span>
+					#end
+				
+			#end
+			
+			
+		</div>			
+	#end
+
+
+## ENTITIES
+#if($canviewentitiesbreadcrumb)
+	#set( $entities = $userprofile.getEntitiesInParent($category) )
+	#if(!$entities.isEmpty())
+	<div class="category-entities-actions">
+		#foreach ( $data in $entities)
+			#set($entity = $data.getData())
+			#set($entityid = $data.getId())
+			#set($emoduleid = $data.getModuleId()) 
+			
+			#set($emodule = $mediaarchive.getData("module", $emoduleid))
+			
+			#set($rendertype = $emodule.modulerendertype)
+			#if (!$rendertype)
+	   			#set($rendertype = "entity")
+			#end
+			$context.putPageValue("rendertype", $rendertype)
+			$context.putPageValue("rendermoduleid", $emoduleid)
+			
+			#set($moduleicon = "entity")
+	     	#if ($emodule.moduleicon)
+	     		#set($moduleicon = $emodule.moduleicon)
+	     	#end
+		     	
+			#set($previewurl = "$!{siteroot}$apphome/views/modules/$!{emoduleid}/components/gridsample/preview/${rendertype}.html?id=$entity.getId()&hitssessionid=$!hits.sessionId")
+			
+			$context.putPageValue("hit", $entity)
+			
+			#set($moduleicon = "entity")
+	    	#if ($module.moduleicon)
+	    		#set($moduleicon = $module.moduleicon)
+	    	#end
+	    	
+			<div class="category-entity">    	
+				<a href="$previewurl" 
+		   	 	class="emdialog entity-dialog emgridresulttitle " 
+		   	 	data-hidefooter="true" 
+		   	 	data-hideheader="true"
+		   	 	id="clickid${entityid}"  
+		   	 	data-id="${entityid}"
+		   	 	data-moduleid="$!emoduleid"
+		   	 	title="#text($!entity)">
+		   	 	<img src="$siteroot$apphome/theme/images/entity/${moduleicon}.svg" style="height: 23px;">
+		   	 	#text($emodule) \ #text($entity)&nbsp; <i class="fas fa-external-link-alt"></i></a>
+	   	 	</div>
+		#end
+		<div class="clearfix"></div>
+	</div>
+	#end
+#end
+
+
+##Filters displayed with filters-inline.html
+	
+	<div class="clearfix"></div>
+
+</div>
+#end
+
+ 

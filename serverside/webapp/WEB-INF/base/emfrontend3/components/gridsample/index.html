@@ -1,0 +1,11 @@
+
+
+#if( $hits.getSearchQuery().hasMainInput())
+	$pages.include("$componenthome/quicksearch/suggestions.html",$context)
+#end
+
+<div id="modulesearchresultsdiv" data-moduleid="$!module.id" >
+	$pages.include("$componenthome/gridsample/module.html",$context)
+	<div class="clearfix"></div>
+</div>
+

@@ -1,0 +1,21 @@
+#set($moduleid = $module.id)
+ 
+#set($expandedmodule = $moduleid)
+
+#set( $count = $hits.size())
+$context.putPageValue("count", $count)
+
+$pages.include("$componenthome/filters/filters-selected.html",$context)
+
+
+$context.putPageValue("showcategoriesheader", true)
+$context.putPageValue("showentitiesheader", true)
+
+
+##<div id="$!{moduleid}resultscontainer" class="assetsresultscontainer">
+$pages.includeContent()
+##</div>
+
+
+
+$pages.include("$apphome/views/modules/$module.id/modules.html", $context)

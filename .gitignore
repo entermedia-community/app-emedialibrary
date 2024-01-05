@@ -1,0 +1,17 @@
+/hs*.log
+/bin/
+/logs/
+/serverside/webapp/site/mediadb/services/module
+/serverside/webapp/site/catalog/views/modules
+/serverside/webapp/site/catalog/views/settings
+/dartpackages/openinsitute_core/.flutter-plugins
+/dartpackages/openinsitute_core/.flutter-plugins-dependencies
+serverside/webapp/assets
+
+serverside/webapp/WEB-INF/temp
+serverside/webapp/WEB-INF/tmp
+serverside/webapp/WEB-INF/trash
+/**/build/ 
+
+serverside/webapp/WEB-INF/data
+serverside/webapp/finder/

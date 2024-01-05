@@ -1,0 +1,8 @@
+
+<root>
+  <property id="primaryimage"/>
+  <property id="entityperson"/>
+  <property id="faceprofilestatus"/>
+  <property id="entity_date"/>
+  <property id="sample"/>
+</root>

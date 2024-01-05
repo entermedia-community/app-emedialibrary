@@ -1,0 +1,85 @@
+##always reset it?
+
+#if($tabmodule)
+	#set( $searchtype = $tabmodule.getId())
+	#set( $moduleid = $tabmodule.getId())
+#end
+#ifnull($id)
+	#set( $id = $context.getRequestParameter("id"))
+#end
+#ifnull($id)
+	#set( $id = $context.getRequestParameter("entityid"))
+#end
+#if(!$tabtype)
+	#set($tabtype = $context.getRequestParamenter("tabtype"))
+#end
+#if($tabtype == "submodulehome")
+	#set($tabid = "tab_${viewid}")
+	#set($tabname = $viewdata.getName($context))
+#elseif($tabtype=="media")
+	#set($tabid = "tab_media")
+	#set($tabname = $tabmodule.getName($context))
+#else
+	
+		#if( !$entity)
+			#set( $entity  = $mediaarchive.getData($searchtype, $id) )
+		#end
+
+		#set($tabname = $viewdata.getName($context))
+
+		#set($targetentitytabid = "entity-tab-#eid($!{viewid})")
+		#set($tabid = "tab_$viewid")
+	
+
+#end
+
+<div class="entity-tab  #if($currenttab == $tabid) current-entity #end" 
+	#if(!$tabtype) data-entityid="$!entity.getId() #end">
+	<a 
+		#if($addnew=='true')
+			href="#"
+		#else
+			href="#$!tabid"
+		#end 
+		class="entity-tab-label"
+		id="tab_$!tabid"
+		data-tabid="$!tabid"
+		data-currenttab="$!tabid"
+		data-tabtype="$!tabtype" 
+		data-toggle="tab"
+		data-target="$!targetentitytabid"
+		data-topmoduleid="$!topmoduleid"
+		data-moduleid="$!moduleid"
+		#if($id.startsWith("multiedit"))
+			data-ismultiedit="true"
+			data-edit="true"
+		#end 
+		role="tab" 
+		#if(!$tabtype)
+			aria-controls="$targetentitytabid" 
+			data-entityid="$!entity.getId()"
+		#end 
+		title="#esc($tabname)">
+		
+	   	#if (!$moduleicon && $tabmodule.moduleicon)
+	   		#set($moduleicon = $tabmodule.moduleicon)
+	   	#end
+	   	#if(!$moduleicon)
+	   		#set($moduleicon = "data")
+	   	#end
+	   	<img src="$siteroot$apphome/theme/images/entity/${moduleicon}.svg" style="height: 22px;"> 
+		#if($tabtype == "submodulehome")
+			#text($tabname)
+		#elseif($tabtype=="media") 
+			 #text($tabmodule)
+		#else
+			#text($tabname)
+		#end
+		</a>
+		
+		
+</div>
+
+
+
+

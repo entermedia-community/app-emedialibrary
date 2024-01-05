@@ -1,0 +1,22 @@
+
+<properties beanname="">
+  
+  <!--  header information and style -->
+  <property id="name" />
+  <property id="title" />
+  <property id="subheading" />
+
+  <property id="logoasset" />
+  <property id="logopath" />
+  <property id="logowidth" />
+  <property id="logoheight" />
+
+
+  <property id="headerstyle" />
+  <property id="headerheight" />
+
+  <property id="headercolor" />
+  <property id="headercolorgradient" />
+  
+
+</properties>

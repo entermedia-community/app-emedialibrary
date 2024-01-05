@@ -1,0 +1,68 @@
+#set($moduleid = $module.getId())
+#if (!$rendertype && $moduleid)
+	#if(!$module)
+		#set($module = $mediaarchive.getCachedData("module", $moduleid))
+	#end
+   	#set($rendertype = $module.modulerendertype)
+#end
+#if (!$rendertype)
+   	#set($rendertype = "entity")
+#end
+$context.putPageValue("entityrendertype", $rendertype)
+
+#set( $topmodule = $module)
+$context.putPageValue("topmodule", $topmodule)
+
+#set($topentityid = $context.getRequestParameter("topentityid"))
+
+#if( !$entity)
+	#set( $entity  = $mediaarchive.getData($topmodule.getId(), $entityid) )
+#end
+
+#set($uploadsourcepath =  $topmodule.getValue("uploadsourcepath"))
+$context.putPageValue("uploadsourcepath", $uploadsourcepath)
+
+#set($maintargetdiv = "$!{moduleid}resultscontainer")
+$context.putPageValue("maintargetdiv", $maintargetdiv)
+
+
+
+<div id="$maintargetdiv"
+	class="resultsdiv moduleajaxreloadtarget"
+	data-moduleid="$topmodule.getId()"
+	data-hitssessionid="$!hits.getSessionId()"
+	data-url="$apphome/views/modules/$!{module.id}/index.html"
+	data-componenthome = "$!componenthome"
+	data-searchhome="$!home$!componenthome/results"
+	data-targetdiv="$maintargetdiv"
+	#if($topentityid) data-topentityid="$topentityid" #end
+	data-oemaxlevel="1"
+>	
+ 	<div class="emgrid-box expandedmodule" >
+ 		<div class="emgrid-subtitle">
+	  		<h3>
+	     	#set($moduleicon = "entity")
+	     	#if ($module.moduleicon)
+	     		#set($moduleicon = $module.moduleicon)
+	     	#end
+	     	
+	    	#set($entityurl = "$siteroot$apphome/views/modules/$module.id/index.html")
+	
+			<img src="$siteroot$apphome/theme/images/entity/${moduleicon}.svg" style="height: 26px;"> 
+	
+			#set( $count = $hits.size()) 
+			#text($module)
+			<span class="count">($count)</span>
+			</h3>
+			$context.putPageValue("moduleid", $moduleid)
+			$pages.include("$apphome/views/modules/${moduleid}/contextmenu.html", $context)
+			
+			##$pages.include("$apphome/components/gridfilters/filter-selected-entity.html", $context)
+						
+			<div class="clearfix"></div>
+		</div>
+		$pages.include("$componenthome/results/index.html", $context)
+	</div>
+</div>
+
+

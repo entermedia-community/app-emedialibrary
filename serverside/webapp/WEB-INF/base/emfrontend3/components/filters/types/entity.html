@@ -1,0 +1,54 @@
+#set( $fieldname = $detail.getId() )
+#set( $values = $filternode.children)
+#if( !$values && $data )
+	#set($values = $data.getValues($detail.id) )
+#end
+
+<div id="$!{idprefix}listdetail_$fieldname" class="listdetailpicker" data-rendertype="multiselect">
+#set($searcher = $searcherManager.getSearcher($detail.getListCatalogId(), $detail.getListId() ))
+#set($entity_module = $detail.getListId())
+
+#set ($foreignkeyid = $detail.getListId() )
+
+#set($searchfield = "name")
+#set($detailid = $detail.getId().replace('.','-') )
+#set($idcount = $context.getRequestParameter("idcount"))
+#if(!$idcount)
+	#set($idcount = "")
+#end
+#set( $valueid = "list-${detailid}${idcount}value")
+
+
+
+	#set( $count = 0 )
+	#foreach($entry in $values)
+		#if($count<=10)
+			<div>
+			<input class="filtercheck filtercheck${fieldname}" 
+				data-fieldname="${fieldname}" type="checkbox" name="${fieldname}.value" 
+				id="$!{idprefix}$entry.getId()${fieldname}_val" value="$entry.getId()" #if( $hits.getSearchQuery().hasTermValue($filternode.id,$entry.getId()) ) checked #end />
+			<label for="$!{idprefix}$entry.getId()${fieldname}_val">$entry.getText($context) ($entry.count)</label>
+			#set($count = $count +1)
+			</div>
+		#end
+	#end
+	#if ($values.size() > 10)
+		<select id="${fieldname}select2" 
+				name="${fieldname}.value" 
+				class="listdropdown choose-select detail-select form-control #if($detail.isRequired() && !$multiedit) required #end" 
+				listid="${fieldname}filter" 
+				data-listid="${fieldname}filter" 
+				data-searchtype= '$searchtype'
+				data-searchfield="$searchfield"
+				onchange="if( typeof updatelisteners == 'function' )updatelisteners('$catalogid','$searchtype','$!view','$fieldname');"
+				data-allowclear="false">
+			<option value=""></option>
+		#foreach($entry in $values)
+			<option value="$entry.getId()" #if(  $hits.getSearchQuery().hasTermValue($filternode.id,$entry.getId()) ) selected #end>#esc($entry.getText($context))</option>
+		#end
+		</select>
+	#end
+
+
+</div>
+

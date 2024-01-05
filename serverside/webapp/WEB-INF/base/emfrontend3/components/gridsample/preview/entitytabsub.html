@@ -1,0 +1,83 @@
+#set($viewsearcher = $searcherManager.getSearcher($catalogid, "view"))
+
+#ifnull($viewid)
+	#set($viewid = $context.getRequestParameter("viewid"))
+#end
+#ifnull($parentsearchtype)
+	#set($parentsearchtype = $context.getRequestParameter("parentsearchtype"))
+#end
+#ifnull($parentid)
+	#set($parentid = $context.getRequestParameter("parentid"))
+#end
+
+#set( $targetviewpath = "${parentsearchtype}/"+$viewid)
+#set( $viewdata = $viewsearcher.searchById($viewid))
+#set( $subentitysearchtype = $viewdata.rendertable )
+#set( $submodule = $mediaarchive.getCachedData("module", $subentitysearchtype))
+#set( $fieldexternalid = $viewdata.renderexternalid)
+#set( $fieldexternalvalue = $parentid)
+
+#set( $sortby = $!viewdata.rendersort)
+#if(!$sortby)
+	#set( $sortby = "name")
+#end
+
+#set($targetrendertype = $submodule.modulerendertype)
+#if(!$targetrendertype)
+	#set($targetrendertype = "entity")
+#end
+
+#set($tabid = "tab_${viewid}")
+
+#if(!$currenttab)
+	#set($currenttab = $context.getRequestParameter("currenttab"))
+#end
+
+#if($subentitysearchtype)
+	<div id="$tabid" 
+		class="editentitymetadata-submodule entity-tab-content tabtype$!tabtype" 
+		style=" #if($currenttab != $tabid) display:none; #end"
+		data-tabtype="submodulehome"
+		data-viewid="$!viewid"
+		data-currenttab="$currenttab"
+		data-submoduleid="$!submodule.getId()"
+		data-viewid="$!viewid"
+		data-parentsearchtype="$!parentsearchtype"
+		data-parentid=$!parentid
+		data-url="$componenthome/gridsample/preview/entitytabsub.html"
+		#if($hidesubmodule) style="display: none; #end">
+		
+		
+			#set( $args = "parentid=$!parentid&searchtype=$!subentitysearchtype&$!{subentitysearchtype}clearresults=true")
+			#set( $args = "$args&fieldexternalid=$!fieldexternalid&fieldexternalvalue=$!fieldexternalvalue")
+			#set( $args = "$args&field=$!fieldexternalid&$!{fieldexternalid}.value=$!fieldexternalvalue&operation=exact")
+			#set( $args = "$args&viewid=$!viewid&viewpath=$!targetviewpath&hitsperpage=6&targetrendertype=$!targetrendertype")
+			#set( $args = "$args&parentsearchtype=$!parentsearchtype&targetdiv=submodulepicker&sortby=$!sortby")
+			
+			$context.putPageValue("moduleid", $!submodule.getId() )
+			$context.putPageValue("submoduleresults", $!submoduleresults )				
+			$pages.include("/$applicationid/views/modules/$!subentitysearchtype/components/table/subentitytable.html?$!args",$context)
+		
+		
+		#set($addentitylink = "$!siteroot$applink/views/modules/${submodule.getId()}/edit/table/generictablesearch.html")
+		#set($addentitylink = "$addentitylink?submodulesearchtype=$subentitysearchtype&fieldexternalid=$fieldexternalid&fieldexternalvalue=$!fieldexternalvalue&parentviewid=$!viewid&parentviewpath=$!viewpath&parentid=$!id&parentsearchtype=$!parentsearchtype&rendertype=$!targetrendertype")
+		#if($permissions.can($!submodule.getId() , "create"))
+		<div class="submodule-actions">
+			<a class="btn btn-sm btn-blue ajax  submoduleedit"  
+			href="$addentitylink" 
+			##data-targetdiv="$submodulepickerid"
+			data-targetdivinner="$tabid"
+			data-oemaxlevel="1"
+			data-parentviewid="$!viewid"
+			data-parentviewpath="$!viewpath"
+			data-parenttargetdiv="entity-wraper"
+			data-parentid="$!id"
+			data-hidefooter="true"
+			data-onbefore="switchsubmodulebox"
+			title="[[Add]] #text($viewdata)"><i class="fas fa-plus"></i> #text($viewdata)</a>
+		</div>
+	#end
+	</div>
+	
+	
+#end

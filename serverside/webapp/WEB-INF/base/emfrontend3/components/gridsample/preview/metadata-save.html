@@ -1,0 +1,7 @@
+<div class="alert-primary alert-save fader">
+<strong>[[Saved]]</strong>
+</div>
+
+#set($addnew = $context.getRequestParameter("addnew"))
+
+$pages.include("$apphome/components/gridsample/preview/entity.html", $context)

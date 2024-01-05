@@ -1,0 +1,38 @@
+#set($idcount = $context.getRequestParameter("idcount"))
+#if(!$idcount)
+	#set($idcount = "")
+#end
+#if( $val && !$val.isEmpty() )
+
+##set( $val = $val.replace(","," | ") )
+#set( $vals = $val.split("\s*\|\s*") )
+
+#set( $type = $detail.getListId() )
+#set($link = $context.getPageValue("tagssearchlink"))
+#if(!$link)
+	#set($link = "$siteroot$apphome/views/modules/asset/index.html")
+#end
+
+#set($clearfilters = $context.getPageValue("clearfilters"))
+
+<div class="tageditor-viewer">
+#foreach( $val in $vals )
+	## #set($link = "$siteroot$apphome/views/search/search.html?field=${type}&operation=contains&${type}.value=#esc($val)&assetclearresults=true&assetclearselection=true&clearselection=true&clearfilters=true")
+	
+	#set($fulllink = "$link?field=${type}&operation=contains&${type}.value=#esc($val)")
+	#if ($clearfilters)
+		#set($fulllink = "$fulllink&clearfilters=true")
+	#end
+	<a
+	class="badge badge-tags tageditor-${type} ajax" 
+	href="$fulllink"
+	data-targetdiv="applicationcontent"
+	data-oemaxlevel="4"
+	data-updateurl="true"
+	data-closemediaviewer="true"
+	data-closedialog="true" 
+	title="#esc($val)">#esc($val)</a> 
+#end
+</div>
+<div class="clearfix"></div>
+#end

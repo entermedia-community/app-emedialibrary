@@ -1,0 +1,24 @@
+#if (!$hit)
+	#set ($hit = $asset)
+#end
+
+#if (!$hit)
+	#set ($hit = $data)
+#end
+
+#set ($sourcepath = $hit.sourcepath)
+#set ( $urlutils = $context.getPageValue("url_util"))
+#if ($urlutils)
+	#set ( $sourcepath = $urlutils.encode($sourcepath))
+	#set ( $sourcepath = $sourcepath.replace("%2F", "/") )
+#end
+
+
+
+<div class="emthumbholder-mime">
+	#set ($mime = $mediaarchive.getMimeTypeIcon($hit.fileformat))
+	#set( $thumbpath =  "$themeprefix/images/mimetypes/${mime}.png" )
+	<div class="mimethumbcontainer">
+	<img class="mimethumb" style="height:64px" src="$!cdn$siteroot$thumbpath" border="0"/>
+	</div>
+</div>

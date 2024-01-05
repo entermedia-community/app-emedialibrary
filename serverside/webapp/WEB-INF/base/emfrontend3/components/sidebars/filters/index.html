@@ -1,0 +1,23 @@
+#if(!$moduleid)
+	#set( $moduleid = $module.getId())
+#end
+ 
+<div class="summary-container">
+	<div class="d-flex align-items-center justify-content-between">
+		<div class="summary-header summary-toggler">
+			<h3>[[Summary]]</h3>
+			<button class="btn">
+				<i class="fas fa-angle-double-right"></i>
+			</button>
+		</div>
+	</div>
+	<div class="p-1" style="border-left:1px solid #e5e5e5;height:100%">
+		<div class="col-sidebar-scroll">
+		#if($module.getId()=="modulesearch")
+			$pages.include("$apphome/components/gridfilters/index.html", $context)
+		#else
+			$pages.include("$componenthome/filters/index.html", $context)
+		#end
+		</div>
+	</div>
+</div>
