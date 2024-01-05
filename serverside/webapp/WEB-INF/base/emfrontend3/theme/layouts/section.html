@@ -1,9 +1,9 @@
-<div style="padding: 40px;">
-	<div class="ui-widget">
-		<div class="ui-widget-header">$content.sectiontitle</div>
-		<div class="ui-widget-content clearfix" style="padding: 30px;">
+<div class="contentlayout">
+	
+	#if($content.sectiontitle)<div class="">$content.sectiontitle</div>#end
+	<div style="padding: 30px 0;">
 				$pages.includeContent()
-		</div>
 	</div>
+	
 </div>
 

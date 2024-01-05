@@ -2,7 +2,6 @@
 .selectedclip .timecellcaption
 {
 	background-color: #ffab7d;
-	font-weight: bold;
 }
 
 .selectedtime
@@ -17,6 +16,9 @@
 	background-color: #ffaf7d;
 }
 
+.selectedclip .timecellcaption .cliptime {
+	color:#555;
+}
 
 #bottom-slider #btmcontent ul#slider_vdo
 {
@@ -53,6 +55,33 @@
 	background: #666;
 }
 
+.grabmove {
+	position: absolute;
+	left:-3px;
+	top:-3px;
+	width: 18px;
+	display: none;
+	color:#bbb;
+	background-color: #555;
+	border-radius: 3px;
+	font-size: 0.8rem;
+	cursor: move;
+}
+
+.timecell
+{
+	cursor: pointer;
+}
+
+.timecell:hover .grabmove {
+	display: block;
+}
+
+.grabmove:hover {
+	color:#fff;
+}
+
+
 .productpanel {
 
   position: absolute; 
@@ -80,11 +109,24 @@ z-index: 1;
 #video-container{
 	background-color: #333;
 	border-top:2px solid #222;
-	padding:10px;
-	 position: relative;
-	 width:100%;
+	padding:0;
+	position: relative;
+	width:100%;
+	height: 260px;
 }
 
+@media (min-width: 1460px) {
+	#video-container{
+		height: 290px;
+	}
+}
+
+#video-container .player {
+	height: 100%;
+}
+#video-container .player .video-js {
+	width: 96%;
+}
 #video-container video { margin: 0 auto;}
 
 #product-dialog{
@@ -356,9 +398,8 @@ padding-top: 1px;
 
 .timelineviewer {
 	width:100%;
-	background-color: #fff;
 	position:relative;
-	padding:10px 0 30px 30px;
+	padding:10px 0 30px 0;
 	overflow: hidden;
 }
 
@@ -374,14 +415,33 @@ padding-top: 1px;
 	clear: both;
 	min-height: 400px;
 	position:relative;
+	margin-left:60px;
 }
 
 .timelineviewercontainer {
-	overflow-x:auto;
-	margin-right:20px;
+	margin:20px;
+	background-color: #fff;
+	color:#111;
+	position:relative;
+}
+.timelinevieweractions {
+	width:1280px;
+	height:40px;
+	margin:0 auto;
 }
 
-@media (max-width: 1910px) {
+.timelineviewerinside {
+	width:1280px;
+	margin:0 auto;
+	
+}
+.timelineviewerarrows {
+	position:absolute;
+	top:4px;;
+	right:10px;
+	width:80px;
+}
+@media (max-width: 90px) {
 	.timelineviewercontainer {
 		overflow-x:auto;
 	}
@@ -391,10 +451,20 @@ padding-top: 1px;
 	}
 	
 }
+@media (max-width: 1610px) {
+	.timelineviewercontainer {
+		overflow-x:auto;
+	}
+	.timelinedata {
+		min-height: 480px;
+		height: 100%;
+	}
+	
+}
 
 .videotimelinecreate {
 	background-color: #333;
-	padding:5px 0px 0px 0px;
+	padding:0 0px 0px 0px;
 	margin:0;
 }
 
@@ -426,7 +496,7 @@ padding-top: 1px;
 	z-index:5;
 }
 
-#timelineviewerbackground { position:absolute; width:calc(100% - 40px); height: 100%; top:0; z-index:5;}
+#timelineviewerbackground { position:absolute; margin-top:90px; width:calc(100% - 40px); height: 100%; top:0; z-index:5;}
 
 
 .cctimelinedata {
@@ -434,9 +504,27 @@ padding-top: 1px;
 } 
 
 
-.clipedit {padding:20px 10px;}
+.clipedit {padding:0 10px;}
+
+#timelineeditor .clipdetail { 
+	display:block;
+}
+
+#timelineeditor .clipdetails a {
+	color:#409c40;
+	font-weight: bold;
+	text-decoration: none;
+}
+#timelineeditor .clipdetails a:hover {
+	text-decoration: underline;
+
+	}
+
+#timelineeditor .cliptext { 
+	display:block;
+}
 
 
-.iconbarcontainer {
-	margin-bottom:10px;
+.clickjump img {
+	cursor: pointer;
 }

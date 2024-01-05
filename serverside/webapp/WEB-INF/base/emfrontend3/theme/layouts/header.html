@@ -1,95 +1,111 @@
-<div id="header" class="emheader clearfix" role="banner">
-
-#set($lastselected = $userprofile.last_selected_module )
- 
-#if(!$lastselected)
-	#set ($lastselected = $content.module )	
-	
-#end
-#if(!$lastselected)
-	#set($lastselected = "asset" )
-#end
-
-#set($module = $searcherManager.getData($catalogid, "module", $lastselected ) )
-
-#set($logourl = "$home$themeprefix/images/logo.png")
-
-<div class="logocontainer">
-	<a class="emlogo" href="$home$apphome/index.html"><img class="logo" src="$logourl" alt="EnterMedia EMShare" /></a>
-</div>
-<div class="emheader-right">
-<div class="navlinks">
-<ul> 
-	#if( $user )
-    	#if( $canviewmyaccount ) 
-    		<li class="first"><a href="$home$apphome/views/myaccount/myassets/index.html">[[My Account]]</a></li>
-    	#end 
-    	<li #if( !$canviewmyaccount )  class="first" #end><a href="$home$apphome/authentication/logout.html">[[Logout]]</a></li> 
-    #else 
-    	<li><a href="$home$apphome/authentication/login.html" class="first">[[Login]]</a></li> 
-    #end
-    #if($user)
-	#set( $localesearcher = $mediaarchive.getSearcher("locale") )
-       #set($currentlang = $localesearcher.searchById($context.language))
-      #if($currentlang)
- 	<li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown" data-bs-toggle="dropdown">$currentlang</a> 
-    #else
- 	<li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown" data-bs-toggle="dropdown">[[Language]]</a> 
-     #end
-  
-  	<div id="language-bar-select" class="dropdown-menu">
-		#set( $localesearcher = $mediaarchive.getSearcher("locale") )
-		#set( $languages = $localesearcher.query().match("enabled", "true").search($context) )
-		#foreach( $lang in $languages)
-			#set($langurl = "$home$apphome/components/languages/changelanguage.html?newlang=locale_$lang.id&origURL=$context.getPathUrl()")
-			 <a class="dropdown-item" href="#urlescape($langurl)">$lang </a>
-		#end
-    </div> 
-	</li>
-	#end	
-	
-    #if($canviewsettings)
-   	<li><a href="$home$apphome/views/dashboard/index.html" >[[Dashboard]]</a></li> 
-   	<li><a #if ( $module ) href="$home$apphome/views/settings/modules/$module.id/index.html" #else href="$home$apphome/views/settings/index.html" #end>[[Settings]]</a></li> 
-    #end 
-
-#set($lastselected = $userprofile.last_selected_module )
-#if(!$lastselected)
-	#set ($lastselected = $content.module )
-#end
-#if(!$lastselected)
-      #set($lastselected = "asset" )
-#end   
-#if( $userprofile.getModules().size() > 1 )
-    #set($module = $searcherManager.getData($catalogid, "module", $lastselected ) )
-	#if( !$module ) 
-		##in case they deleted an old selected module 
-	    #set($module = $searcherManager.getData($catalogid, "module", "asset" ) )
+#if($cansidebar)
+	#set($forcedsidebarcomponent = $context.getRequestParameter("sidebarcomponent")) 
+	#if($forcedsidebarcomponent)
+		#set( $sidebarcomponent = $forcedsidebarcomponent )
 	#end
-#set( $urlbase = "$home$apphome/views/modules" )
-<li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown" data-bs-toggle="dropdown">$module.getName($context)</a> 
-	<div id="module-bar-select" class="dropdown-menu">
-		#foreach ( $amodule in $userprofile.getModules() )
-			<a class="dropdown-item" href="$urlbase/${amodule.id}/index.html?field=last_selected_module&last_selected_module.value=${amodule.id}">
-			#text($amodule)</a>
+	
+	#if($sidebarcomponent == "categories" && !$canviewcategorynav )
+		#set($sidebarcomponent = "")
+	#end
+	#if($sidebarcomponent)
+		#set( $sidebarwidth = $userprofile.get("sidebarwidth"))
+		
+		#if($sidebarwidth=='' || $sidebarwidth=='undefined')
+			#set($sidebarwidth = 280)
+		#end
+	#end
+#end
+
+<div id="header" class="mediacenterheader autostickywidth d-flex align-items-center justify-content-between p-3 pb-4">
+	<div class="logocontainer">
+		#set ($homeurl = "$!{siteroot}$apphome/index.html")
+		#ifnotnull($category)
+			#set( $assetid = $category.findValue("headercategoryimage") )
+			#ifnotnull($assetid)
+				#set($logoasset = $mediaarchive.getCachedData("asset",$assetid))
+				#set($logourl = $mediaarchive.asLinkToOriginal($logoasset))
+				#set($logourl = "$siteroot/$mediadbappid/services/module/asset/downloads/originals/${logourl}")
+			#end
+			#ifnotnull( $logourl)
+			<a class="emlogo-custom" href="$homeurl" title="[[eMediaWorkspace]]" data-clearfilters="true">	
+				<span>
+					<img src="$logourl" class="logoimg" alt="[[eMediaWorkspace]]" />
+				</span>
+			</a>
+			#end
+		#end
+		#ifnull( $logourl)
+			#set( $logourl = "$!{siteroot}$themeprefix/images/logo.png")
+			<a class="emlogo" href="$homeurl" title="[[eMediaWorkspace]]">	
+				<span>
+					<img src="$logourl" class="logoimg" alt="[[eMediaWorkspace]]" />
+				</span>
+			</a>
 		#end
 	</div>
-</li>
-#end
-
-    </ul>
- </div>
- 
-#if( $userprofile.hasModule("order") )
-#set( $orders = $mediaarchive.query("order").exact("checkoutstatus","pending").search($context))
-#if( $orders.size() > 0)
-<div id="headerstatusarea"  class="alert alert-primary" role="alert">
-<a href="$apphome/views/modules/order/fieldsearch.html?field=checkoutstatus&checkoutstatus.value=pending&operation=exact">
-	<i class="fas fa-info-circle"></i>
-	[[Pending Orders]]  ($orders.size())</a>
-</div>
-#end
-#end
-</div>
-<div id="site-title">$!content.tagline</div>
+	#if($canviewquicksearchheader)
+		$pages.include("$apphome/components/gridfilters/header-search.html", $context)
+	#end
+	#if($user)
+	<div class="position-relative">
+		<button class="em navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon text-white"></span>
+		</button> 
+		<div class="navbar-collapse collapse" id="navbarNavDropdown">
+			<ul class="navbar-nav d-flex flex-column">
+			#if($canviewsettings)
+				<li class="nav-item">
+					<a href="$!{siteroot}$apphome/views/dashboard/index.html" class="nav-link ajax" 
+						data-targetdivinner="application" data-updateurl="true" data-oemaxlevel="4" title="[[Dashboard]]">
+						[[Dashboard]]
+					</a>
+				</li>
+			#end
+			#if( $user )
+				#if( $canviewmyaccount ) 
+					<li class="nav-item">
+						<a class="nav-link ajax" data-targetdivinner="application" data-updateurl="true" data-oemaxlevel="4" href="$!siteroot$apphome/views/myaccount/index.html"  title="[[Account Settings]]">
+							[[My Account]]
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link ajax" data-targetdivinner="application" data-updateurl="true" data-oemaxlevel="4" href="$!siteroot$apphome/views/myaccount/orders/index.html"  title="[[My Orders]]">
+							[[My Orders]]
+						</a>
+					</li>
+				#end
+				#set( $localesearcher = $mediaarchive.getSearcher("locale") )
+				#set($currentlang = $localesearcher.searchById($context.language))
+				<li class="nav-item dropdown dropleft">
+					<a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">
+						#if($currentlang)
+							$currentlang
+						#else
+							[[Language]]
+						#end
+					</a> 
+					<div id="language-bar-select" class="dropdown-menu">
+						#set( $languages = $localesearcher.query().named("localehits").match("enabled", "true").search($context) )
+						#foreach( $lang in $languages)
+							#set($langurl = "$home$apphome/components/languages/changelanguage.html?newlang=locale_${lang.id}&origURL=$context.getPathUrl()")
+							<a class="nav-link" href="#urlescape($langurl)">$lang</a>
+						#end
+					</div> 
+				</li>
+				<li  class="nav-item">
+					<a class="nav-link" href="$!siteroot$apphome/authentication/logout.html" title="[[Logout]]">
+						[[Logout]] ($user)
+					</a>
+				</li> 
+			#else 
+				<li  class="nav-item">
+					<a class="nav-link" href="$!siteroot$apphome/authentication/login.html"  title="[[Login]]">
+						[[Login]]
+					</a>
+				</li> 
+			#end
+			</ul>
+		</div>
+	</div>
+	#end
 </div>
